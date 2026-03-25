@@ -19,7 +19,7 @@ int main() {
     int row = 0;
     bool flag = true;
     // Please write your code here.
-    while (1) {
+    while (row < n) {
         //check
         for (int i = k; i<k+m; i++) {
             if (a[row][i] == 1) {
@@ -33,6 +33,7 @@ int main() {
         }
         row++;
     }
+    if (flag) row--;
 
     for (int i = k; i<k+m; i++) a[row][i] = 1;
 
