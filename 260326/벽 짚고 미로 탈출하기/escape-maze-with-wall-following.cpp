@@ -6,6 +6,7 @@ int n, y, x;
 char grid[100][100];
 int dy[4] = {-1, 0, 1, 0};
 int dx[4] = {0, 1, 0, -1};
+bool visited[100][100][4];
 
 int main() {
     cin >> n >> y >> x;
@@ -26,6 +27,11 @@ int main() {
     // Please write your code here.
     while (1) {
         //cout << y << " " << x << " " << sec << " " << dir << '\n';
+        if (visited[y][x][dir]) {
+            cout << -1;
+            return 0;
+        }
+        visited[y][x][dir] = true;
         int ny = y + dy[dir];
         int nx = x + dx[dir];
 
@@ -57,10 +63,6 @@ int main() {
             }
         }
         sec++;
-        if (y == oy && x == ox) {
-            cout << -1; 
-            return 0;
-        }
     }
 
 
