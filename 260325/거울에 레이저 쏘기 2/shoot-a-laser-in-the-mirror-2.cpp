@@ -35,7 +35,7 @@ int main() {
         sx = n-1 - k % n;
     }
     else {
-        sy = n-1 % k&n;
+        sy = n-1 - k % n ;
         sx = 0;
     }
 
