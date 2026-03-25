@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -8,9 +9,8 @@ int dx[4] = {0,1,0,-1};
 
 int main() {
     int n,m;
-    int grid[100][100];
-
     cin >> n >> m;
+    vector<vector<int>> grid (n, vector<int>(n));
 
     for (int i = 0; i<m; i++) {
         int y,x;
