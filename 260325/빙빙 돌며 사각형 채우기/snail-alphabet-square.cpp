@@ -39,7 +39,7 @@ int main() {
         y = ny;
         x = nx;
         nc += 1;
-        if (nc > 0 + 'Z') nc -= 'A';
+        if (nc > 0 + 'Z') nc = 'A';
     }
 
     for (int i = 0; i<n; i++) {
