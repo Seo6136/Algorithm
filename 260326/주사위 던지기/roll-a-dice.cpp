@@ -26,37 +26,40 @@ int main() {
     for (int i = 0; i < m; i++) {
         char inst;
         cin >> inst;
-        int ny,nx,nn;       //go
-        if (inst == 'U') {
-            ny = y + dy[0];
-            nx = x + dx[0];
+
+        int dir;
+        if (inst == 'U') dir = 0;
+        else if (inst == 'R') dir = 1;
+        else if (inst == 'D') dir = 2;
+        else dir = 3;
+
+        int ny = y + dy[dir];
+        int nx = x + dx[dir];
+
+        if (ny < 0 || ny > n-1 || nx < 0 || nx > n-1) continue;
+
+        int nn;
+
+        if (dir == 0) { // U
             nn = nd[0];
             nd[0] = 7 - nowval;
             nd[2] = nowval;
         }
-        else if (inst == 'D') {
-            ny = y + dy[2];
-            nx = x + dx[2];
+        else if (dir == 2) { // D
             nn = nd[2];
             nd[0] = nowval;
             nd[2] = 7 - nowval;
         }
-        else if (inst == 'R') {
-            ny = y + dy[1];
-            nx = x + dx[1];
+        else if (dir == 1) { // R
             nn = nd[1];
-            nd[1] = 7-nowval;
+            nd[1] = 7 - nowval;
             nd[3] = nowval;
         }
-        else {
-            ny = y + dy[3];
-            nx = x + dx[3];
+        else { // L
             nn = nd[3];
             nd[1] = nowval;
-            nd[3] = 7-nowval;
+            nd[3] = 7 - nowval;
         }
-
-        if (ny < 0 || ny > n-1 || nx < 0 || nx > n-1) continue;
 
         y = ny;
         x = nx;
