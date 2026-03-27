@@ -18,7 +18,7 @@ void dfs(int y, int x, vector<vector<char>> visited) {
         int nx = x + dx[i];
         //cout << ny << " " << nx << '\n';
 
-        if (ny < 0 || ny > n-1 || nx < 0 || nx > n-1 || maze[ny][nx] == 0 || visited[ny][nx] == 1) continue;
+        if (ny < 0 || ny > n-1 || nx < 0 || nx > m-1 || maze[ny][nx] == 0 || visited[ny][nx] == 1) continue;
         visited[ny][nx] = 1;
         dfs(ny,nx,visited);
         visited[ny][nx] = 0;
