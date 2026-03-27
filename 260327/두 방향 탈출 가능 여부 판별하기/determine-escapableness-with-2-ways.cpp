@@ -10,7 +10,7 @@ int dy[2] = {1,0};
 int dx[2] = {0,1};
 
 void dfs(int y, int x, vector<vector<char>> visited) {
-    if (y == n-1 && x == n-1) flag = true;
+    if (y == n-1 && x == m-1) flag = true;
     if (flag) return;
 
     for (int i = 0; i<2; i++) {
