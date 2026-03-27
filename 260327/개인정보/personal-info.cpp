@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <iomanip>
 using namespace std;
 
 struct inf {
@@ -30,6 +31,7 @@ int main() {
     }
 
     sort(arr, arr+5, cmp2());
+    cout << fixed << setprecision(1);
 
     cout << "name" << '\n';
     for (int i = 0; i<5; i++) {
