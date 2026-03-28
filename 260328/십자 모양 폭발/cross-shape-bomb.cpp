@@ -4,7 +4,7 @@
 using namespace std;
 
 int n;
-int blocks[100][100];
+int blocks[200][200];
 
 int main() {
     cin >> n;
