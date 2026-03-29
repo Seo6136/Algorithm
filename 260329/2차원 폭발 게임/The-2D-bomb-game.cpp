@@ -10,22 +10,32 @@ void do_it() {
     //delete bombs
     bool flag = true;
     while (flag) {
+        /*for (int i = 0; i<n; i++) {
+            for (int j = 0; j<n; j++) cout << grid[i][j] << " ";
+            cout << '\n';
+        }*/
+        //cout << '\n';
         flag = false;
         for (int x = 0; x<n; x++) {
             for (int y = 0; y<n; y++) {
                 int num = grid[y][x];
                 if (num == 0) continue;
-                int cnt = 1;
+                int start = y;
+                int end = y;
+                int cnt;
 
                 for (int ny = y+1; ny < n;  ny++) {
                     if (grid[ny][x] == 0) continue;
-                    if (num == grid[ny][x]) cnt++;
+                    if (num == grid[ny][x]) {
+                        cnt++;
+                        end = ny;
+                    }
                     else break;
                 }
 
-                if (cnt >= m) {
+                if (end - start + 1 >= m) {
                     flag = true;
-                    for (int i = 0; i < cnt; i++) grid[y+i][x] = 0;
+                    for (int i = y; i <= end; i++) grid[i][x] = 0;
                 }
             }
         }
