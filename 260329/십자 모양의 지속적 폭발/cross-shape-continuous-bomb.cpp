@@ -4,7 +4,7 @@
 using namespace std;
 
 int n,y,x,m;
-int blocks[100][100];
+int blocks[200][200];
 
 void delete_bombs(int y, int x) {
     //bombs
