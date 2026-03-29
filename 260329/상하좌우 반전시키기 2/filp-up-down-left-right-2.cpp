@@ -59,6 +59,7 @@ int main() {
         change_grid(0,i,grid);
     }
 
-    cout << minclick;
+    if (minclick == INT_MAX) cout << -1;
+    else cout << minclick;
     return 0;
 }
