@@ -25,10 +25,10 @@ void find_sum(int cnt, int sum, int idx, unordered_set<int> tmp) {
             }
         }
         if (flag) {
-            for (int c:cn[i]) tmp.insert(c);
+            auto next = tmp;
+            for (int c:cn[i]) next.insert(c);
             //cout << "select " << nums[i] << '\n';
-            find_sum(cnt+1, sum+nums[i], i+1, tmp);
-            for (int c:cn[i]) tmp.erase(c);
+            find_sum(cnt+1, sum+nums[i], i+1, next);
         }
     }
 }
