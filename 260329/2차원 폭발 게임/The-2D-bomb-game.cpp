@@ -16,43 +16,40 @@ void do_it() {
         }*/
         //cout << '\n';
         flag = false;
-        for (int x = 0; x<n; x++) {
-            for (int y = 0; y<n; y++) {
-                int num = grid[y][x];
-                if (num == 0) continue;
-                int start = y;
-                int end = y;
-                int cnt;
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+            int num = grid[y][x];
+            if (num == 0) continue;
 
-                for (int ny = y+1; ny < n;  ny++) {
-                    if (grid[ny][x] == 0) continue;
-                    if (num == grid[ny][x]) {
-                        cnt++;
-                        end = ny;
-                    }
-                    else break;
-                }
+            int start = y;
+            int end = y;
 
-                if (end - start + 1 >= m) {
-                    flag = true;
-                    for (int i = y; i <= end; i++) grid[i][x] = 0;
-                }
+            for (int ny = y + 1; ny < n; ny++) {
+                if (grid[ny][x] == num) end = ny;
+                else break;
+            }
+
+            if (end - start + 1 >= m) {
+                flag = true;
+                for (int i = start; i <= end; i++) grid[i][x] = 0;
+            }
+
+            y = end;
             }
         }
-    }
-    
-    //apply gravity
-    for (int x = 0; x<n; x++) {
-        vector<int> tmp;
-        int zero = 0;
-        for (int y = n-1; y>=0; y--) {
-            if (grid[y][x] != 0) tmp.push_back(grid[y][x]);
-            else zero++;
+        //apply gravity
+        for (int x = 0; x<n; x++) {
+            vector<int> tmp;
+            int zero = 0;
+            for (int y = n-1; y>=0; y--) {
+                if (grid[y][x] != 0) tmp.push_back(grid[y][x]);
+                else zero++;
+            }
+            for (int t = 0; t<tmp.size(); t++) {
+                grid[n-1-t][x] = tmp[t];
+            }
+            for (int y = 0; y<zero; y++) grid[y][x] = 0;
         }
-        for (int t = 0; t<tmp.size(); t++) {
-            grid[n-1-t][x] = tmp[t];
-        }
-        for (int y = 0; y<zero; y++) grid[y][x] = 0;
     }
 
     //turn right
