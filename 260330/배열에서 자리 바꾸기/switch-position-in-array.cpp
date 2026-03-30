@@ -8,71 +8,75 @@ struct Node {
 };
 
 void swap_ranges(Node* fs, Node* fe, Node* ss, Node* se) {
-    Node* a = fs->prev;
-    Node* b = fe->nxt;
-    Node* c = ss->prev;
-    Node* d = se->nxt;
+    Node* A = fs->prev;
+    Node* B = fe->nxt;
+    Node* C = ss->prev;
+    Node* D = se->nxt;
 
-    if (b == ss) {
-        a->nxt = ss;
-        ss->prev = a;
+    if (B == ss) {
+        A->nxt = ss;
+        ss->prev = A;
 
         se->nxt = fs;
         fs->prev = se;
 
-        fe->nxt = d;
-        if (d) d->prev = fe;
+        fe->nxt = D;
+        if (D) D->prev = fe;
     } else {
-        a->nxt = ss;
-        ss->prev = a;
+        A->nxt = ss;
+        ss->prev = A;
 
-        se->nxt = b;
-        if (b) b->prev = se;
+        se->nxt = B;
+        if (B) B->prev = se;
 
-        c->nxt = fs;
-        fs->prev = c;
+        C->nxt = fs;
+        fs->prev = C;
 
-        fe->nxt = d;
-        if (d) d->prev = fe;
+        fe->nxt = D;
+        if (D) D->prev = fe;
     }
 }
 
 int main() {
-    Node* nodes[250001];
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
     int n, q;
     cin >> n >> q;
 
-    Node* root = new Node;
-    nodes[0] = root;
+    Node* nodes[250001];
+
+    Node* head = new Node;   // 앞 센티넬
+    Node* cur = head;
 
     for (int i = 1; i <= n; i++) {
         Node* p = new Node;
         p->num = i;
-        p->prev = nodes[i - 1];
-        p->prev->nxt = p;
+        p->prev = cur;
+        cur->nxt = p;
+        cur = p;
         nodes[i] = p;
     }
 
     for (int i = 0; i < q; i++) {
-        int s1, e1, s2, e2;
-        cin >> s1 >> e1 >> s2 >> e2;
+        int a, b, c, d;
+        cin >> a >> b >> c >> d;
 
-        Node* fs = nodes[s1];
-        Node* fe = nodes[e1];
-        Node* ss = nodes[s2];
-        Node* se = nodes[e2];
+        Node* fs = nodes[a];
+        Node* fe = nodes[b];
+        Node* ss = nodes[c];
+        Node* se = nodes[d];
+
+        // 첫 번째 구간이 실제로 더 뒤에 있다면 순서 교체가 필요할 수 있음
+        // 문제 입력이 항상 앞 구간 먼저 준다면 생략 가능
 
         swap_ranges(fs, fe, ss, se);
-
-        // nodes 배열의 인덱스 의미가 "값별 노드 포인터"라면 갱신 불필요
-        // 노드 자체는 그대로이고 위치만 바뀌기 때문
     }
 
-    Node* cur = root->nxt;
-    while (cur != nullptr) {
-        cout << cur->num << " ";
-        cur = cur->nxt;
+    Node* p = head->nxt;
+    while (p != nullptr) {
+        cout << p->num << ' ';
+        p = p->nxt;
     }
 
     return 0;
