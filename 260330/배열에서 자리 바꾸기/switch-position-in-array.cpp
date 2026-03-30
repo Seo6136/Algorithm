@@ -7,6 +7,18 @@ struct Node {
     Node* nxt = nullptr;
 };
 
+const int MAXN = 250000;
+Node* nodes[MAXN + 1];
+
+bool is_before(Node* a, Node* b) {
+    Node* cur = a;
+    while (cur != nullptr) {
+        if (cur == b) return true;
+        cur = cur->nxt;
+    }
+    return false;
+}
+
 void swap_ranges(Node* fs, Node* fe, Node* ss, Node* se) {
     Node* A = fs->prev;
     Node* B = fe->nxt;
@@ -21,19 +33,20 @@ void swap_ranges(Node* fs, Node* fe, Node* ss, Node* se) {
         fs->prev = se;
 
         fe->nxt = D;
-        if (D) D->prev = fe;
-    } else {
+        if (D != nullptr) D->prev = fe;
+    }
+    else {
         A->nxt = ss;
         ss->prev = A;
 
         se->nxt = B;
-        if (B) B->prev = se;
+        if (B != nullptr) B->prev = se;
 
         C->nxt = fs;
         fs->prev = C;
 
         fe->nxt = D;
-        if (D) D->prev = fe;
+        if (D != nullptr) D->prev = fe;
     }
 }
 
@@ -44,9 +57,7 @@ int main() {
     int n, q;
     cin >> n >> q;
 
-    Node* nodes[250001];
-
-    Node* head = new Node;   // 앞 센티넬
+    Node* head = new Node;
     Node* cur = head;
 
     for (int i = 1; i <= n; i++) {
@@ -67,8 +78,10 @@ int main() {
         Node* ss = nodes[c];
         Node* se = nodes[d];
 
-        // 첫 번째 구간이 실제로 더 뒤에 있다면 순서 교체가 필요할 수 있음
-        // 문제 입력이 항상 앞 구간 먼저 준다면 생략 가능
+        if (!is_before(fs, ss)) {
+            swap(fs, ss);
+            swap(fe, se);
+        }
 
         swap_ranges(fs, fe, ss, se);
     }
