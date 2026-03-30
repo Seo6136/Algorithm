@@ -21,6 +21,7 @@ void swap_ranges(Node* fs, Node* fe, Node* ss, Node* se) {
         fs->prev = se;
 
         fe->nxt = d;
+        if (d) d->prev = fe;
     } else {
         a->nxt = ss;
         ss->prev = a;
@@ -32,6 +33,7 @@ void swap_ranges(Node* fs, Node* fe, Node* ss, Node* se) {
         fs->prev = c;
 
         fe->nxt = d;
+        if (d) d->prev = fe;
     }
 }
 
@@ -62,6 +64,9 @@ int main() {
         Node* se = nodes[e2];
 
         swap_ranges(fs, fe, ss, se);
+
+        // nodes 배열의 인덱스 의미가 "값별 노드 포인터"라면 갱신 불필요
+        // 노드 자체는 그대로이고 위치만 바뀌기 때문
     }
 
     Node* cur = root->nxt;
