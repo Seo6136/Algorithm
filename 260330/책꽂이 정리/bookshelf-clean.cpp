@@ -1,237 +1,155 @@
 #include <iostream>
-#include <deque>
-
 using namespace std;
 
-struct Node{
-    int num;
+struct Node {
+    int num = 0;
     Node* prev = nullptr;
     Node* nxt = nullptr;
-    Node* tail = nullptr;
-    int cnt = 0;
+    Node* tail = nullptr; 
+    int cnt = 0;          
 };
 
+Node* pop_front(Node* head) {
+    if (head->cnt == 0) return nullptr;
+
+    Node* x = head->nxt;
+
+    if (head->cnt == 1) {
+        head->nxt = nullptr;
+        head->tail = nullptr;
+    } else {
+        head->nxt = x->nxt;
+        head->nxt->prev = head;
+    }
+
+    x->prev = nullptr;
+    x->nxt = nullptr;
+    head->cnt--;
+    return x;
+}
+
+Node* pop_back(Node* head) {
+    if (head->cnt == 0) return nullptr;
+
+    Node* x = head->tail;
+
+    if (head->cnt == 1) {
+        head->nxt = nullptr;
+        head->tail = nullptr;
+    } else {
+        head->tail = x->prev;
+        head->tail->nxt = nullptr;
+    }
+
+    x->prev = nullptr;
+    x->nxt = nullptr;
+    head->cnt--;
+    return x;
+}
+
+void push_front(Node* head, Node* first, Node* last, int add_cnt) {
+    if (first == nullptr) return;
+
+    if (head->cnt == 0) {
+        head->nxt = first;
+        head->tail = last;
+        first->prev = head;
+        last->nxt = nullptr;
+    } else {
+        Node* old_head = head->nxt;
+        head->nxt = first;
+        first->prev = head;
+        last->nxt = old_head;
+        old_head->prev = last;
+    }
+    head->cnt += add_cnt;
+}
+
+void push_back(Node* head, Node* first, Node* last, int add_cnt) {
+    if (first == nullptr) return;
+
+    if (head->cnt == 0) {
+        head->nxt = first;
+        head->tail = last;
+        first->prev = head;
+        last->nxt = nullptr;
+    } else {
+        head->tail->nxt = first;
+        first->prev = head->tail;
+        head->tail = last;
+        last->nxt = nullptr;
+    }
+    head->cnt += add_cnt;
+}
 
 int main() {
-    // head of bookself
-    Node *nodes[101];
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    int n,k,q;
-
+    int n, k, q;
     cin >> n >> k >> q;
-    nodes[1] = new Node;
 
-    for (int i = 1; i<=k; i++) {
-        Node* p = new Node;
-        nodes[i] = p;
+    Node* shelf[101];
+
+    for (int i = 1; i <= k; i++) {
+        shelf[i] = new Node; 
     }
 
-    Node* cur = nodes[1];
-    for (int i = 1; i<=n; i++) {
-        Node* p = new Node;
-        p->num = i;
-
-        cur->nxt = p;
-        p->prev = cur;
-
-        cur = p;
-        nodes[1]->tail = cur;
+    for (int i = 1; i <= n; i++) {
+        Node* book = new Node;
+        book->num = i;
+        push_back(shelf[1], book, book, 1);
     }
-    nodes[1]->cnt = n;
 
-    /*for (int i = 1; i<=k; i++) {
-        Node* cur = nodes[i];
-        if (cur->cnt == 0) cout << 0 << '\n';
-        else {
-            cout << cur->cnt << " ";
-            cur = cur->nxt;
-            while(cur != nullptr) {
-                cout << cur->num << " ";
-                cur = cur->nxt;
-            }
-        }
-        cout << '\n';
-    }*/
-
-    //cout << nodes[1]->nxt->num << " " << nodes[1]->tail->num << '\n';
-
-    for (int x = 0; x<q; x++) {
+    while (q--) {
         int inst, i, j;
-
         cin >> inst >> i >> j;
 
         if (inst == 1) {
-            //cout << "at 1 " << '\n';
-            if (nodes[i]->nxt == NULL) continue;
-            Node *from = nodes[i]->nxt;
-            Node *to = nodes[j]->tail;
-
-            //cout << from->num << " " << to->num <<'\n';
-            //cout << from->prev->num << " " << to->prev->num <<'\n';
-            
-            nodes[i]->nxt = from->nxt;
-            from->nxt->prev = nodes[i];
-            from->nxt = nullptr;
-
-            if (nodes[j]->nxt == nullptr) {
-                nodes[j]->nxt = from;
-                from->prev = nodes[j];
-            }
-            
-            else {
-                from->prev = to;
-                to->nxt = from;
-            }
-
-            nodes[j]->tail = from;
-            nodes[i]->cnt--;
-            nodes[j]->cnt++;
-
-            
-            /*for (int y = 1; y<=k; y++) {
-                Node* cur = nodes[y];
-                if (cur->cnt == 0) cout << 0;
-                else {
-                    cout << cur->cnt << " ";
-                    cur = cur->nxt;
-                    while(cur != nullptr) {
-                        cout << cur->num << " ";
-                        cur = cur->nxt;
-                    }
-                }
-                cout << '\n';
-            }*/
+            Node* x = pop_front(shelf[i]);
+            if (x != nullptr) push_back(shelf[j], x, x, 1);
         }
-
         else if (inst == 2) {
-            //cout << "at 2" << '\n';
-            if (nodes[i]->nxt == NULL) continue;
-            Node *from = nodes[i]->tail;
-            Node *to = nodes[j]->nxt;
-            nodes[i]->tail = from->prev;
-
-            from->prev->nxt = nullptr;
-
-            if (nodes[j]->nxt == nullptr) {
-                nodes[j]->nxt = from;
-            }
-            
-            else {
-                from->prev = nodes[j];
-                from->nxt = nodes[j]->nxt;
-                nodes[j]->nxt = from;
-            }
-            nodes[j]->tail = from;
-            nodes[i]->cnt--;
-            nodes[j]->cnt++;
-            
-            /*for (int y = 1; y<=k; y++) {
-                Node* cur = nodes[y];
-                if (cur->cnt == 0) cout << 0;
-                else {
-                    cout << cur->cnt << " ";
-                    cur = cur->nxt;
-                    while(cur != nullptr) {
-                        cout << cur->num << " ";
-                        cur = cur->nxt;
-                    }
-                }
-                cout << '\n';
-            }*/
+            Node* x = pop_back(shelf[i]);
+            if (x != nullptr) push_front(shelf[j], x, x, 1);
         }
-
         else if (inst == 3) {
-            //cout << "at 3" << '\n';
-            if (i == j) continue;
-            if (nodes[i]->nxt == NULL) continue;
-            Node *h = nodes[i]->nxt;
-            Node *t = nodes[i]->tail;
-            Node *oh = nodes[j]->nxt;
-            int tmp = nodes[i]->cnt;
+            if (i == j || shelf[i]->cnt == 0) continue;
 
-            //cout << h->num << " " << t->num << " " << oh->num << '\n';
+            Node* first = shelf[i]->nxt;
+            Node* last = shelf[i]->tail;
+            int moved = shelf[i]->cnt;
 
-            nodes[i]->nxt = nullptr;
-            nodes[i]->tail = nullptr;
-            nodes[i]->cnt = 0;
-            
-            h->prev = nodes[j];
-            nodes[j]->nxt = h;
-            
-            if (nodes[j]->nxt != nullptr) {
-                oh->prev = t;
-                t->nxt = oh;
-            }
-            
-            nodes[j]->cnt += tmp;
-            nodes[j]->tail = t;
+            shelf[i]->nxt = nullptr;
+            shelf[i]->tail = nullptr;
+            shelf[i]->cnt = 0;
 
-            /*for (int y = 1; y<=k; y++) {
-                Node* cur = nodes[y];
-                if (cur->cnt == 0) cout << 0;
-                else {
-                    cout << cur->cnt << " ";
-                    cur = cur->nxt;
-                    while(cur != nullptr) {
-                        cout << cur->num << " ";
-                        cur = cur->nxt;
-                    }
-                }
-                cout << '\n';
-            }*/
+            push_front(shelf[j], first, last, moved);
         }
+        else if (inst == 4) {
+            if (i == j || shelf[i]->cnt == 0) continue;
 
-        else {
-            //cout << "at 4" << '\n';
-            if (i == j) continue;
-            if (nodes[i]->nxt == NULL) continue;
-            Node *h = nodes[i]->nxt;
-            Node *t = nodes[i]->tail;
-            int tmp = nodes[i]->cnt;
+            Node* first = shelf[i]->nxt;
+            Node* last = shelf[i]->tail;
+            int moved = shelf[i]->cnt;
 
-            h->prev = nullptr;
-            nodes[i]->nxt = nullptr;
-            nodes[i]->tail = nullptr;
-            nodes[i]->cnt = 0;
+            shelf[i]->nxt = nullptr;
+            shelf[i]->tail = nullptr;
+            shelf[i]->cnt = 0;
 
-            if (nodes[j]->nxt == nullptr) {
-                nodes[j]->nxt = h;
-                h->prev = nodes[j];
-            }
-            else {
-                h->prev = nodes[j]->nxt;
-                nodes[j]->nxt->nxt = h;
-            }
-
-            nodes[j]->tail = t;
-            nodes[j]->cnt += tmp;
-            /*for (int y = 1; y<=k; y++) {
-                Node* cur = nodes[y];
-                if (cur->cnt == 0) cout << 0;
-                else {
-                    cout << cur->cnt << " ";
-                    cur = cur->nxt;
-                    while(cur != nullptr) {
-                        cout << cur->num << " ";
-                        cur = cur->nxt;
-                    }
-                }
-                cout << '\n';
-            }*/
+            push_back(shelf[j], first, last, moved);
         }
     }
-    for (int y = 1; y<=k; y++) {
-        Node* cur = nodes[y];
-        if (cur->cnt == 0) cout << 0;
-        else {
-            cout << cur->cnt << " ";
+
+    for (int s = 1; s <= k; s++) {
+        cout << shelf[s]->cnt;
+        Node* cur = shelf[s]->nxt;
+        while (cur != nullptr) {
+            cout << ' ' << cur->num;
             cur = cur->nxt;
-            while(cur != nullptr) {
-                cout << cur->num << " ";
-                cur = cur->nxt;
-            }
         }
         cout << '\n';
     }
+
     return 0;
 }
