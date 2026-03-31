@@ -1,13 +1,17 @@
 #include <iostream>
-#include <set>
-#include <map>
-
+#include <vector>
+#include <cstring>
 
 using namespace std;
 
-int n,m,t,seq,tt;
-map<pair<int,int>, int> marvels;
-int visited[50][50];
+struct marvel{
+    int y,x,dir;
+    bool alive = true;
+};
+
+int n,m,t,tt;
+vector<marvel> marvels;
+int cnt[50][50];
 int dy[4] = {-1,0,1,0};
 int dx[4] = {0,1,0,-1};
 
@@ -18,20 +22,15 @@ int to_dir(char d) {
     else return 3;
 }
 
-map<pair<int,int>, int> moving() {
-    map<pair<int,int>,int> tmp;
-    set<pair<int,int>> to_del;
-
-    auto it = marvels.begin();
-
+void moving() {
     //move marvels
-    for (it; it != marvels.end(); ++it) {
-        int y = it->first.first;
-        int x = it->first.second;
-        int dir = it->second;
+    for (auto &it:marvels) {
+        if (!it.alive) continue;
+        int y = it.y;
+        int x = it.x;
+        int dir = it.dir;
 
         //cout << "at " << y << " " << x << " " << dir << '\n';
-
         int ny = y + dy[dir];
         int nx = x + dx[dir];
 
@@ -41,31 +40,24 @@ map<pair<int,int>, int> moving() {
             dir += 2;
             dir = dir % 4;
         }
-
-        if (visited[ny][nx] == seq) {
-            to_del.insert({ny,nx});
-        }
-        else {
-            visited[ny][nx] = seq;
-            tmp[{ny,nx}] = dir;
-        }
+        it.y = ny;
+        it.x = nx;
+        it.dir = dir;
+        cnt[ny][nx]++;
     }
 
-    //delete overlapped marvels
-    for (auto coord:to_del) {
-        tmp.erase(coord);
+    for (auto &it:marvels) {
+        if (!it.alive) continue;
+        int y = it.y;
+        int x = it.x;
+
+        if (cnt[y][x] >= 2) it.alive=false;
     }
-
-    //it = tmp.begin();
-    //for (it; it != tmp.end(); it++) cout << it->first.first << " " << it->first.second << " " << it->second << '\n';
-
-    return tmp;
 
 }
 
 int main() {
     cin >> t;
-    seq = 1;
 
     for (int tc = 0; tc<t; tc++) {
         cin >> n >> m;
@@ -80,17 +72,21 @@ int main() {
             x-=1;
             dir = to_dir(d);
             
-            marvels[{y,x}] = dir;
+            marvels.push_back({y,x,dir,true});
         }
 
         tt = n * 2;
         
         for (int i = 0; i<tt; i++) {
-            marvels = moving();
-            seq++;
+            moving();
+            memset(cnt, 0, sizeof(cnt));
         }
+        int ans = 0;
 
-        cout << marvels.size() << '\n';
+        for (auto &it:marvels) {
+            if (it.alive) ans++;
+        }
+        cout << ans << '\n';
 
     }
     // Please write your code here.
