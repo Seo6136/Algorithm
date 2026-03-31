@@ -33,21 +33,24 @@ int main() {
 
     sort(bombs, bombs+n);
 
-    long long left = bombs[0];
-    long long right = bombs[n-1];
+    long long left = 0;
+    long long right = bombs[n-1] - bombs[0];
     long long mid;
+
+    long long ans;
 
     while(left <= right) {
         mid = (left+right) / 2;
         //cout << "mid " << mid << '\n';
 
         if (check_bombs(mid)) {
+            ans = mid;
             right = mid - 1;
         }
         else left = mid + 1;
     }
 
-    cout << mid;
+    cout << ans;
 
     return 0;
 }
