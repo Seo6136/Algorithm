@@ -36,7 +36,7 @@ int main() {
             int nx = x + dx[i];
             int nd = d + 1;
 
-            if (ny < 0 || ny > n-1 || nx < 0 || nx > n-1 || visited[ny][nx] == 1 || a[ny][nx] == 0 || nd >= visited[ny][nx]) continue;
+            if (ny < 0 || ny > n-1 || nx < 0 || nx > m-1 || visited[ny][nx] == 1 || a[ny][nx] == 0 || nd >= visited[ny][nx]) continue;
             
             visited[ny][nx] = nd;
             q.push({ny,nx});
@@ -45,8 +45,8 @@ int main() {
 
     
 
-    if (visited[n-1][n-1] == 10000) cout << -1;
-    else cout << visited[n-1][n-1];
+    if (visited[n-1][m-1] == 10000) cout << -1;
+    else cout << visited[n-1][m-1];
 
     return 0;
 }
