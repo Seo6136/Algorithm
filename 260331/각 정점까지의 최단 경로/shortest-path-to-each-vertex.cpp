@@ -12,7 +12,7 @@ int dis[20001];
 
 struct cmp {
     bool operator() (const pair<int,int>& a, const pair<int,int>& b) const {
-        return a.second < b.second;
+        return a.second > b.second;
     }
 };
 void djik(int start) {
