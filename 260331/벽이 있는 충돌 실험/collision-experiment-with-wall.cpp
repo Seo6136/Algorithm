@@ -25,7 +25,7 @@ map<pair<int,int>, int> moving() {
     auto it = marvels.begin();
 
     //move marvels
-    for (it; it != marvels.end(); it++) {
+    for (it; it != marvels.end(); ++it) {
         int y = it->first.first;
         int x = it->first.second;
         int dir = it->second;
