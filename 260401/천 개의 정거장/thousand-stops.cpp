@@ -54,7 +54,7 @@ int main() {
 
         for (int i = 0; i < cnt; i++) {
             int cur = route[i];
-            int nxt = route[(i + 1) % cnt]; // 마지막이면 처음으로 순환
+            int nxt = route[(i + 1)];
             stations[cur].push_back({nxt, fee, busNum});
         }
     }
