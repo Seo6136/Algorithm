@@ -1,92 +1,105 @@
 #include <iostream>
 #include <vector>
-#include <limits.h>
 #include <queue>
+#include <algorithm>
+#include <climits>
 
 using namespace std;
 
-struct way {
-    long long to, fee, bus;
+struct Edge {
+    int to, fee, bus;
 };
-long long dist[101];
-long long pv[101];
 
-struct cmp {
-    bool operator() (const way &a, const way &b) const {
-        return a.fee > b.fee;
+struct State {
+    int station, bus;
+    long long cost;
+};
+
+struct Cmp {
+    bool operator()(const State& a, const State& b) const {
+        return a.cost > b.cost;
     }
 };
 
 int main() {
-    long long a, b, n;
-
+    int a, b, n;
     cin >> a >> b >> n;
 
-    vector<vector<way>> stations(101);
+    vector<vector<Edge>> stations(101);
 
-    fill (dist, dist+101, LONG_LONG_MAX);
-
-    for (long long i = 1; i<=n; i++) {
-        long long fee;
-        long long nums;
+    for (int i = 1; i <= n; i++) {
+        int fee, nums;
         cin >> fee >> nums;
 
-        long long start,to;
+        int start, to;
         cin >> start;
-        for (long long w = 1; w<nums; w++) {
+        for (int j = 1; j < nums; j++) {
             cin >> to;
-            stations[start].push_back({to,fee,i});
+            stations[start].push_back({to, fee, i});
             start = to;
         }
     }
 
-    /*for (int i = 1; i<=5; i++) {
-        cout << "at station " << i << '\n';
-        for (auto& k:stations[i]) cout << k.bus << " " << k.to << " " << k.fee << '\n';
-    }*/
+    vector<vector<long long>> dist(101, vector<long long>(n + 1, LLONG_MAX));
+    vector<vector<pair<int, int>>> pv(101, vector<pair<int, int>>(n + 1, {-1, -1}));
 
-    priority_queue<way, vector<way>, cmp> q;
-    q.push({a,0,0});
-    dist[a] = 0;
-    
-    while (!q.empty()) {
-        long long now = q.top().to;
-        long long fee = q.top().fee;
-        long long bus = q.top().bus;
-        q.pop();
+    priority_queue<State, vector<State>, Cmp> pq;
 
-        //cout << "at station " << now << '\n';
+    dist[a][0] = 0;
+    pq.push({a, 0, 0});  // 시작점, 아직 버스 안 탐
 
-        for (auto &nb:stations[now]) {
-            long long nxt = nb.to;
-            long long nbus = nb.bus;
-            long long nfee;
-            if(bus != nbus) nfee = fee + nb.fee;
-            else nfee = fee;
+    while (!pq.empty()) {
+        State cur = pq.top();
+        pq.pop();
 
-            //cout << "to station " << nxt << " using bus " << nbus << " fee " << nfee << '\n';
+        int now = cur.station;
+        int bus = cur.bus;
+        long long cost = cur.cost;
 
-            if (dist[nxt] > nfee) {
-                //cout << "accept" << '\n';
-                q.push({nxt, nfee, nbus});
-                dist[nxt] = nfee;
-                pv[nxt] = now;
+        if (cost > dist[now][bus]) continue;
+
+        for (const auto& nb : stations[now]) {
+            int nxt = nb.to;
+            int nbus = nb.bus;
+            long long ncost;
+
+            if (bus == nbus) ncost = cost;
+            else ncost = cost + nb.fee;
+
+            if (dist[nxt][nbus] > ncost) {
+                dist[nxt][nbus] = ncost;
+                pv[nxt][nbus] = {now, bus};
+                pq.push({nxt, nbus, ncost});
             }
         }
     }
 
-    if (dist[b] == LONG_LONG_MAX) cout << -1 << " " << -1;
-    else {
-        long long cnt = 0;
-        long long now = b;
+    long long ans = LLONG_MAX;
+    int lastBus = -1;
 
-        while (now != a) {
-            cnt++;
-            now = pv[now];
+    for (int bus = 0; bus <= n; bus++) {
+        if (dist[b][bus] < ans) {
+            ans = dist[b][bus];
+            lastBus = bus;
         }
-
-        cout << dist[b] << " " << cnt;
     }
-    
+
+    if (ans == LLONG_MAX) {
+        cout << -1 << " " << -1;
+        return 0;
+    }
+
+    int cnt = 0;
+    int curStation = b;
+    int curBus = lastBus;
+
+    while (!(curStation == a && curBus == 0)) {
+        cnt++;
+        auto prev = pv[curStation][curBus];
+        curStation = prev.first;
+        curBus = prev.second;
+    }
+
+    cout << ans << " " << cnt;
     return 0;
 }
