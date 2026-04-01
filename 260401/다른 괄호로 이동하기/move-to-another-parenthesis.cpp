@@ -12,16 +12,22 @@ vector<vector<pair<int,int>>> nodes;
 int dy[4] = {-1,0,1,0};
 int dx[4] = {0,1,0,-1};
 
+struct cmp {
+    bool operator() (const pair<int,int> &a, const pair<int,int> &b) const {
+        return a.second > b.second;
+    }
+};
+
 int get_node(int d) {
-    if (d == 0) return -3;
+    if (d == 0) return -n;
     if (d == 1) return 1;
-    if (d == 2) return 3;
+    if (d == 2) return n;
     if (d == 3) return -1;
     return 0;
 }
 
 int get_mxdis (int start) {
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> q;
+    priority_queue<pair<int,int>, vector<pair<int,int>>, cmp> q;
     vector<int> dist (n*n+1, INT_MAX);
     q.push({start, 0});
     dist[start] = 0;
@@ -47,6 +53,7 @@ int get_mxdis (int start) {
     //for (int i = 1; i<dist.size(); i++) cout << dist[i] << '\n';
     
     auto max_it = max_element(dist.begin()+1, dist.end());
+    //cout << *max_it << '\n';
     return *max_it;
 }
 
