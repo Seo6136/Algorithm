@@ -40,8 +40,8 @@ int main() {
         }
     }
 
-    vector<vector<long long>> dist(101, vector<long long>(n + 1, LLONG_MAX));
-    vector<vector<pair<int, int>>> pv(101, vector<pair<int, int>>(n + 1, {-1, -1}));
+    vector<vector<long long>> dist(1001, vector<long long>(n + 1, LLONG_MAX));
+    vector<vector<pair<int, int>>> pv(1001, vector<pair<int, int>>(n + 1, {-1, -1}));
 
     priority_queue<State, vector<State>, Cmp> pq;
 
