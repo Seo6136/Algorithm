@@ -1,39 +1,23 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <climits>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-struct Edge {
-    int to;
-    long long fee;
-    int bus;
-};
-
-struct Info {
-    long long cost;
-    long long time;
-};
+using ll = long long;
+const ll INF = (1LL << 60);
 
 struct State {
-    int station;
-    int bus;
-    long long cost;
-    long long time;
-};
-
-struct Cmp {
-    bool operator()(const State& a, const State& b) const {
-        if (a.cost != b.cost) return a.cost > b.cost;
-        return a.time > b.time;
+    ll cost, time;
+    int node;
+    bool operator<(const State& other) const {
+        if (cost != other.cost) return cost > other.cost; // min-heap
+        if (time != other.time) return time > other.time;
+        return node > other.node;
     }
 };
 
-bool better(long long c1, long long t1, long long c2, long long t2) {
-    if (c1 != c2) return c1 < c2;
-    return t1 < t2;
-}
+struct Bus {
+    ll fee;
+    vector<int> stops;
+};
 
 int main() {
     ios::sync_with_stdio(false);
@@ -42,69 +26,56 @@ int main() {
     int A, B, N;
     cin >> A >> B >> N;
 
-    vector<vector<Edge>> stations(1001);
+    vector<Bus> buses(N);
+    vector<vector<pair<int, int>>> appear(1001); 
+    // appear[stop] = {(busIndex, positionInRoute)}
 
-    for (int busNum = 1; busNum <= N; busNum++) {
-        long long fee;
-        int cnt;
-        cin >> fee >> cnt;
-
-        vector<int> route(cnt);
-        for (int i = 0; i < cnt; i++) cin >> route[i];
-
-        for (int i = 0; i < cnt; i++) {
-            int cur = route[i];
-            int nxt = route[(i + 1)];
-            stations[cur].push_back({nxt, fee, busNum});
+    for (int i = 0; i < N; ++i) {
+        int m;
+        cin >> buses[i].fee >> m;
+        buses[i].stops.resize(m);
+        for (int j = 0; j < m; ++j) {
+            cin >> buses[i].stops[j];
+            appear[buses[i].stops[j]].push_back({i, j});
         }
     }
 
-    vector<vector<Info>> dist(1001, vector<Info>(N + 1, {LLONG_MAX, LLONG_MAX}));
-    priority_queue<State, vector<State>, Cmp> pq;
+    vector<ll> distCost(1001, INF), distTime(1001, INF);
+    priority_queue<State> pq;
 
-    dist[A][0] = {0, 0};
-    pq.push({A, 0, 0, 0});
+    distCost[A] = 0;
+    distTime[A] = 0;
+    pq.push({0, 0, A});
 
     while (!pq.empty()) {
-        State cur = pq.top();
+        auto [curCost, curTime, u] = pq.top();
         pq.pop();
 
-        if (dist[cur.station][cur.bus].cost != cur.cost ||
-            dist[cur.station][cur.bus].time != cur.time) {
-            continue;
-        }
+        if (distCost[u] != curCost || distTime[u] != curTime) continue;
+        if (u == B) break;
 
-        for (const auto& e : stations[cur.station]) {
-            long long nextCost = cur.cost;
-            if (cur.bus != e.bus) nextCost += e.fee;
+        for (auto [busIdx, pos] : appear[u]) {
+            const auto& bus = buses[busIdx];
+            ll nextCost = curCost + bus.fee;
 
-            long long nextTime = cur.time + 1;
-            int nextStation = e.to;
-            int nextBus = e.bus;
+            for (int j = pos + 1; j < (int)bus.stops.size(); ++j) {
+                int v = bus.stops[j];
+                ll nextTime = curTime + (j - pos);
 
-            if (better(nextCost, nextTime,
-                       dist[nextStation][nextBus].cost,
-                       dist[nextStation][nextBus].time)) {
-                dist[nextStation][nextBus] = {nextCost, nextTime};
-                pq.push({nextStation, nextBus, nextCost, nextTime});
+                if (nextCost < distCost[v] ||
+                    (nextCost == distCost[v] && nextTime < distTime[v])) {
+                    distCost[v] = nextCost;
+                    distTime[v] = nextTime;
+                    pq.push({nextCost, nextTime, v});
+                }
             }
         }
     }
 
-    long long ansCost = LLONG_MAX;
-    long long ansTime = LLONG_MAX;
-
-    for (int bus = 0; bus <= N; bus++) {
-        if (better(dist[B][bus].cost, dist[B][bus].time, ansCost, ansTime)) {
-            ansCost = dist[B][bus].cost;
-            ansTime = dist[B][bus].time;
-        }
-    }
-
-    if (ansCost == LLONG_MAX) {
-        cout << -1 << ' ' << -1;
+    if (distCost[B] == INF) {
+        cout << "-1 -1\n";
     } else {
-        cout << ansCost << ' ' << ansTime;
+        cout << distCost[B] << ' ' << distTime[B] << '\n';
     }
 
     return 0;
