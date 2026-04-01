@@ -1,105 +1,111 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <algorithm>
 #include <climits>
 
 using namespace std;
 
 struct Edge {
-    int to, fee, bus;
+    int to;
+    long long fee;
+    int bus;
+};
+
+struct Info {
+    long long cost;
+    long long time;
 };
 
 struct State {
-    int station, bus;
+    int station;
+    int bus;
     long long cost;
+    long long time;
 };
 
 struct Cmp {
     bool operator()(const State& a, const State& b) const {
-        return a.cost > b.cost;
+        if (a.cost != b.cost) return a.cost > b.cost;
+        return a.time > b.time;
     }
 };
 
+bool better(long long c1, long long t1, long long c2, long long t2) {
+    if (c1 != c2) return c1 < c2;
+    return t1 < t2;
+}
+
 int main() {
-    int a, b, n;
-    cin >> a >> b >> n;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    vector<vector<Edge>> stations(101);
+    int A, B, N;
+    cin >> A >> B >> N;
 
-    for (int i = 1; i <= n; i++) {
-        int fee, nums;
-        cin >> fee >> nums;
+    vector<vector<Edge>> stations(1001);
 
-        int start, to;
-        cin >> start;
-        for (int j = 1; j < nums; j++) {
-            cin >> to;
-            stations[start].push_back({to, fee, i});
-            start = to;
+    for (int busNum = 1; busNum <= N; busNum++) {
+        long long fee;
+        int cnt;
+        cin >> fee >> cnt;
+
+        vector<int> route(cnt);
+        for (int i = 0; i < cnt; i++) cin >> route[i];
+
+        for (int i = 0; i < cnt; i++) {
+            int cur = route[i];
+            int nxt = route[(i + 1) % cnt]; // 마지막이면 처음으로 순환
+            stations[cur].push_back({nxt, fee, busNum});
         }
     }
 
-    vector<vector<long long>> dist(1001, vector<long long>(n + 1, LLONG_MAX));
-    vector<vector<pair<int, int>>> pv(1001, vector<pair<int, int>>(n + 1, {-1, -1}));
-
+    vector<vector<Info>> dist(1001, vector<Info>(N + 1, {LLONG_MAX, LLONG_MAX}));
     priority_queue<State, vector<State>, Cmp> pq;
 
-    dist[a][0] = 0;
-    pq.push({a, 0, 0});  // 시작점, 아직 버스 안 탐
+    dist[A][0] = {0, 0};
+    pq.push({A, 0, 0, 0});
 
     while (!pq.empty()) {
         State cur = pq.top();
         pq.pop();
 
-        int now = cur.station;
-        int bus = cur.bus;
-        long long cost = cur.cost;
+        if (dist[cur.station][cur.bus].cost != cur.cost ||
+            dist[cur.station][cur.bus].time != cur.time) {
+            continue;
+        }
 
-        if (cost > dist[now][bus]) continue;
+        for (const auto& e : stations[cur.station]) {
+            long long nextCost = cur.cost;
+            if (cur.bus != e.bus) nextCost += e.fee;
 
-        for (const auto& nb : stations[now]) {
-            int nxt = nb.to;
-            int nbus = nb.bus;
-            long long ncost;
+            long long nextTime = cur.time + 1;
+            int nextStation = e.to;
+            int nextBus = e.bus;
 
-            if (bus == nbus) ncost = cost;
-            else ncost = cost + nb.fee;
-
-            if (dist[nxt][nbus] > ncost) {
-                dist[nxt][nbus] = ncost;
-                pv[nxt][nbus] = {now, bus};
-                pq.push({nxt, nbus, ncost});
+            if (better(nextCost, nextTime,
+                       dist[nextStation][nextBus].cost,
+                       dist[nextStation][nextBus].time)) {
+                dist[nextStation][nextBus] = {nextCost, nextTime};
+                pq.push({nextStation, nextBus, nextCost, nextTime});
             }
         }
     }
 
-    long long ans = LLONG_MAX;
-    int lastBus = -1;
+    long long ansCost = LLONG_MAX;
+    long long ansTime = LLONG_MAX;
 
-    for (int bus = 0; bus <= n; bus++) {
-        if (dist[b][bus] < ans) {
-            ans = dist[b][bus];
-            lastBus = bus;
+    for (int bus = 0; bus <= N; bus++) {
+        if (better(dist[B][bus].cost, dist[B][bus].time, ansCost, ansTime)) {
+            ansCost = dist[B][bus].cost;
+            ansTime = dist[B][bus].time;
         }
     }
 
-    if (ans == LLONG_MAX) {
-        cout << -1 << " " << -1;
-        return 0;
+    if (ansCost == LLONG_MAX) {
+        cout << -1 << ' ' << -1;
+    } else {
+        cout << ansCost << ' ' << ansTime;
     }
 
-    int cnt = 0;
-    int curStation = b;
-    int curBus = lastBus;
-
-    while (!(curStation == a && curBus == 0)) {
-        cnt++;
-        auto prev = pv[curStation][curBus];
-        curStation = prev.first;
-        curBus = prev.second;
-    }
-
-    cout << ans << " " << cnt;
     return 0;
 }
