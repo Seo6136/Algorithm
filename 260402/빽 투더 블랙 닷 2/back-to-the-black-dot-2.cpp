@@ -82,6 +82,7 @@ int main() {
     }
 
     for (int i = 1; i <= n; i++) {
+        if (i == r1 || i == r2) continue;
         ll r1toi = rdist1[i];
         ll r2toi = rdist2[i];
 
