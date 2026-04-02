@@ -69,7 +69,7 @@ int main() {
     int mx = 0;
     for (int i = 0; i<n; i++) {
         for (int j = 0; j<n; j++) {
-            for (int k = 0; k<n; k++) {
+            for (int k = 0; k<2*n; k++) {
                 //cout << "dis " << k << '\n';
                 int num = bfs(i,j,k);
                 mx = max(mx,num);
