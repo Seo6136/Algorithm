@@ -1,74 +1,96 @@
 #include <iostream>
 #include <vector>
-#include <climits>
 #include <queue>
 #include <algorithm>
+#include <climits>
 
 using namespace std;
 using ll = long long;
 
-struct inf {
+struct Edge {
     int to;
-    ll l,c;
+    ll l, c;
 };
-struct status {
-    int now;
+
+struct State {
+    int node;
     ll a, b;
     double d;
 };
-struct cmp {
-    bool operator()(const status &a, const status &b) const {
-        return a.d > b.d;
+
+struct Cmp {
+    bool operator()(const State& x, const State& y) const {
+        return x.d > y.d;
     }
 };
-double dist[501];
-int n,m,x;
-
 
 int main() {
+    int n, m, x;
     cin >> n >> m >> x;
 
-    vector<vector<inf>> nodes (n+1);
-    fill(dist, dist+n+1, LLONG_MAX);
+    vector<vector<Edge>> graph(n + 1);
 
-    for (int i = 0; i<m; i++) {
-        int a,b;
-        ll l,c;
-        cin >> a >> b >> l >> c;
-        nodes[a].push_back({b,l,c});
-        nodes[b].push_back({a,l,c});
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        ll l, c;
+        cin >> u >> v >> l >> c;
+        graph[u].push_back({v, l, c});
+        graph[v].push_back({u, l, c});
     }
 
-    priority_queue<status, vector<status>, cmp> q;
-    q.push({1,LLONG_MAX,0,0});
-    dist[1] = 0;
+    vector<vector<pair<ll, ll>>> dist(n + 1);
 
-    while(!q.empty()) {
-        auto cur = q.top();
-        int now = cur.now;
+    priority_queue<State, vector<State>, Cmp> pq;
+
+    dist[1].push_back({LLONG_MAX, 0});
+    pq.push({1, LLONG_MAX, 0, 0});
+
+    while (!pq.empty()) {
+        auto cur = pq.top();
+        pq.pop();
+
+        int now = cur.node;
         ll a = cur.a;
         ll b = cur.b;
-        double d = cur.d;
-        q.pop();
-        //cout << "at " << now << '\n';
 
-        if (d != dist[now]) continue;
+        for (auto& e : graph[now]) {
+            int nxt = e.to;
+            ll na = min(a, e.c);
+            ll nb = b + e.l;
 
-        for (auto &nn:nodes[now]) {
-            int nxt = nn.to;
-            ll na = min(a,nn.c);
-            ll nb = b + nn.l;
-            double nd = nb + double(x) / double(na);
-            //cout << "to " << nxt << " ";
-            //cout << nd << '\n';
-            if (nd < dist[nxt]) {
-                q.push({nxt,na,nb,nd});
-                dist[nxt] = nd;
+            bool skip = false;
+            for (auto& p : dist[nxt]) {
+                if (p.first >= na && p.second <= nb) {
+                    skip = true;
+                    break;
+                }
             }
+            if (skip) continue;
+
+            vector<pair<ll, ll>> tmp;
+            for (auto& p : dist[nxt]) {
+                if (!(na >= p.first && nb <= p.second)) {
+                    tmp.push_back(p);
+                }
+            }
+            dist[nxt] = tmp;
+
+            dist[nxt].push_back({na, nb});
+
+            double nd = nb + (double)x / (double)na;
+            pq.push({nxt, na, nb, nd});
         }
     }
 
-    cout << int(dist[n]);
+    double ans = 1e18;
+    for (auto& p : dist[n]) {
+        ll a = p.first;
+        ll b = p.second;
+        ans = min(ans, b + (double)x / (double)a);
+    }
+
+    if (ans == 1e18) cout << -1;
+    else cout << (int)ans;
 
     return 0;
 }
